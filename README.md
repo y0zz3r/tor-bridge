@@ -1,11 +1,9 @@
 # tor-bridge
 
-1. Updates the package list and upgrades installed packages.
-2. Installs Tor using apt.
-3. Makes a backup copy of the original Tor configuration file.
-4. Configures the Tor bridge settings, including enabling the bridge relay, setting the ORPort to 443, setting the bridge nickname and contact information, configuring the exit policy, and setting the logging settings.
-5. Restarts Tor to apply the new configuration.
+This script starts by prompting the user to enter a nickname for their Tor bridge, and then generates a random SSH port number between 1024 and 65535 using the shuf command. It then updates the package repository and installs the necessary packages for Tor and firewall configuration. The firewall is configured to deny incoming traffic by default, allow outgoing traffic by default, and allow incoming traffic on the new SSH port and outgoing traffic on the default Tor port (9001).
 
-You will need to replace <your_bridge_nickname> and <your_email_address> with your own choices for the bridge nickname and contact information.
+The script adds the Tor Project signing key and repository to the package manager, updates the package repository again, and installs the latest version of Tor. It then configures Tor to use the user-provided bridge nickname and the default port for bridges (443). It also configures the bridge to reject all exit traffic.
 
-Note that running a Tor bridge may have legal implications and should be done only after careful consideration of the risks involved. Additionally, it is recommended to run a Tor bridge on a dedicated machine or virtual machine to avoid exposing other services to potential security risks.
+Next, the script changes the SSH port to the randomly generated port number, restarts the SSH and Tor services to apply the changes, and displays the Tor bridge fingerprint and bandwidth information, which can be used to register the bridge with the Tor network, as well as the newly generated SSH port number.
+
+Overall, this script automates the process of setting up a Tor bridge on a Debian 11 server while also changing the SSH port to a random value to enhance security.
