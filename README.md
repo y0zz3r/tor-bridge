@@ -19,8 +19,7 @@ This script sets up a Tor bridge on a Debian-based Linux system. The bridge help
 
 3. Run the script:
 
-`sudo bash setup.sh
-`
+`sudo bash tor-bridge-setup.sh`
 
 4. Follow the prompts to enter a nickname for your Tor bridge.
 
