@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set -e
+
+# Define variables
+TOR_KEYRING="/usr/share/keyrings/torproject-archive-keyring.gpg"
+TOR_LIST="/etc/apt/sources.list.d/tor.list"
+TORRC="/etc/tor/torrc"
+SSHD_CONFIG="/etc/ssh/sshd_config"
+
 # Prompt user for bridge nickname
 read -p "Enter a nickname for your Tor bridge: " nickname
 
@@ -18,21 +26,18 @@ ufw allow 9001/tcp
 ufw --force enable
 
 # Add Tor Project signing key and repository to package manager
-curl -fsSL https://deb.torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --dearmor | tee /usr/share/keyrings/torproject-archive-keyring.gpg >/dev/null 2>&1
-echo "deb [signed-by=/usr/share/keyrings/torproject-archive-keyring.gpg] https://deb.torproject.org/torproject.org $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/tor.list >/dev/null 2>&1
+curl -fsSL https://deb.torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --dearmor | tee $TOR_KEYRING >/dev/null 2>&1
+echo "deb [signed-by=$TOR_KEYRING] https://deb.torproject.org/torproject.org $(lsb_release -cs) main" | tee $TOR_LIST >/dev/null 2>&1
 apt update
 
-# Install Tor
-apt install -y tor
-
 # Configure Tor bridge with user-provided nickname and default port for bridges (443)
-echo "BridgeRelay 1" >> /etc/tor/torrc
-echo "BridgeNickname $nickname" >> /etc/tor/torrc
-echo "ORPort 443" >> /etc/tor/torrc
-echo "ExitPolicy reject *:*" >> /etc/tor/torrc
+echo "BridgeRelay 1" >> $TORRC
+echo "BridgeNickname $nickname" >> $TORRC
+echo "ORPort 443" >> $TORRC
+echo "ExitPolicy reject *:*" >> $TORRC
 
 # Change SSH port to random port number
-sed -i "s/^#Port 22/Port $ssh_port/" /etc/ssh/sshd_config
+sed -i "s/^#Port 22/Port $ssh_port/" $SSHD_CONFIG
 
 # Restart SSH and Tor services
 systemctl restart sshd
